@@ -1,0 +1,36 @@
+{
+  "name": "hobnob",
+  "version": "0.1.0",
+  "description": "\"Back end for a simple user directory API with recommendation engine\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist && babel src -d dist",
+    "serve": "yarn run build && node dist/index.js",
+    "watch": "nodemon -w src --exec yarn run serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakeSiddall/hobnob.git"
+  },
+  "author": "Jake Siddall <jake.siddall@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JakeSiddall/hobnob/issues"
+  },
+  "homepage": "https://github.com/JakeSiddall/hobnob#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
+    "eslint": "^6.8.0",
+    "nodemon": "^2.0.2",
+    "rimraf": "^3.0.2"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.8.7"
+  }
+}
