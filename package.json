@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist && babel src -d dist",
-    "serve": "yarn run build && node dist/index.js",
-    "test:e2e": "cucumber-js spec/cucumber/features --require-module @babel/register --require spec/cucumber/steps",
+    "serve": "yarn run build && dotenv node dist/index.js",
+    "test:e2e": "dotenv cucumber-js -- spec/cucumber/features --require-module @babel/register --require spec/cucumber/steps",
     "watch": "nodemon -w src --exec yarn run serve"
   },
   "repository": {
@@ -29,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
     "cucumber": "^6.0.5",
+    "dotenv-cli": "^3.1.0",
     "eslint": "^6.8.0",
     "nodemon": "^2.0.2",
     "rimraf": "^3.0.2",
