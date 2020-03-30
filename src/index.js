@@ -1,25 +1,16 @@
 import '@babel/polyfill';
-import http from 'http';
-function requestHandler(req, res) {
-  if (req.method === 'POST' && req.url === '/users') {
-    const payloadData = [];
-    const PAYLOAD_LIMIT = 1e6;
-    req.on('data', function (data) {
-      payloadData.push(data);
-      const bodyString = Buffer.concat(payloadData).toString();
-      if (bodyString.length > PAYLOAD_LIMIT) {
-        res.writeHead(413, { 'Content-Type': 'text/plain' });
-        res.end();
-        res.connection.destroy();
-      }
-    });
+import express from 'express';
+import bodyParser from 'body-parser';
 
-    req.on('end', () => {
-      if (payloadData.length === 0) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          message: 'Payload should not be empty',
-        }));
+const app = express();
+
+app.use(bodyParser.json({ limit: 1e6}));
+
+app.post('/users', (req, res) => {
+      if (req.headers['content-length'] === '0') {
+        res.status(400);
+        res.set('Content-Type', 'application/json');
+        res.json({ message: 'Payload should not be empty' }); 
         return;
       }
       if (req.headers['content-type'] !== 'application/json') {
@@ -29,20 +20,19 @@ function requestHandler(req, res) {
         }));
         return;
       }
-      try {
-        const bodyString = Buffer.concat(payloadData).toString();
-        JSON.parse(bodyString);
-      } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          message: 'Payload should be in JSON format',
-        }));
-      }
-    });
-  } else {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello, World!');
+});
+
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err && err.type === 'entity.parse.failed') {
+    res.status(400);
+    res.set('Content-Type', 'application/json');
+    res.json({ message: 'Payload should be in JSON format'})
+    return;
   }
-}
-const server = http.createServer(requestHandler);
-server.listen(8080);
+  next();
+});
+
+app.listen(process.env.SERVER_PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log('Hobnob API server listening on port ${process.env.SERVER_PORT}!');
+});
