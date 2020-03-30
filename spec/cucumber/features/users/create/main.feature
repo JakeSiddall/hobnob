@@ -4,6 +4,15 @@ Feature: Create User
   user. Our API should also validate the structure of the payload and respond
   with an error if it is invalid.
 
+  Scenario: Minimal Valid User
+
+  When the client creates a POST request to /users
+  And attaches a valid Create User payload
+  And sends the request
+  Then our API should respond with a 201 HTTP status code
+  And the payload of the response should be a string
+  And the payload object should be added to the database, grouped under the "user" type
+
   Scenario Outline: Bad Client Requests
 
   If the client sends a POST request to /users with an empty payload, it
