@@ -1,6 +1,7 @@
 import assert from 'assert';
 import superagent from 'superagent';
 import { When, Then } from 'cucumber';
+import {getValidPayload, convertStringToArray } from './utils';
 
 When(/^the client creates a (GET|POST|PATCH|PUT|DELETE|OPTIONS|HEAD) request to ([/\w-:.]+)$/, function (method, path) {
   this.request = superagent(method, `${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}${path}`);
@@ -10,7 +11,7 @@ When(/^attaches a generic (.+) payload$/, function (payloadType) {
   switch (payloadType) {
     case 'malformed':
       this.request
-        .send('{"email": "dan@danyll.com", name: }')
+        .send('{"email": "jake.siddall@gmail.com", name: }')
         .set('Content-Type', 'application/json');
       break;
     case 'non-JSON':
@@ -97,15 +98,12 @@ When(/^attaches an? (.+) payload which is missing the ([a-zA-Z0-9, ]+) fields?$/
   });
 
   When(/^attaches an? (.+) payload where the ([a-zA-Z0-9, ]+) fields? (?:is|are) exactly (.+)$/, function (payloadType, fields, value) {
-    const payload = {
-      email: 'e@ma.il',
-      password: 'password',
-    };
-    const fieldsToModify = fields.split(',').map(s => s.trim()).filter(s => s !== '');
+    this.requestPayload = getValidPayload(payloadType);
+    const fieldsToModify = convertStringToArray(fields);
     fieldsToModify.forEach((field) => {
-      payload[field] = value;
+      this.requestPayload[field] = value;
     });
     this.request
-      .send(JSON.stringify(payload))
+      .send(JSON.stringify(this.requestPayload))
       .set('Content-Type', 'application/json');
   });
