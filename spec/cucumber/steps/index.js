@@ -136,7 +136,7 @@ When(/^attaches an? (.+) payload which is missing the ([a-zA-Z0-9, ]+) fields?$/
   Then(/^the payload object should be added to the database, grouped under the "([a-zA-Z]+)" type$/, function (type, callback) {
     this.type = type;
       client.get({
-        index: 'hobnob',
+        index: process.env.ELASTICSEARCH_INDEX, //process.env.ELASTICSEARCH_INDEX
         type: type,
         id: this.responsePayload
       }).then((result) => {
@@ -147,7 +147,7 @@ When(/^attaches an? (.+) payload which is missing the ([a-zA-Z0-9, ]+) fields?$/
 
   Then('the newly-created user should be deleted', function (callback) {
     client.delete({
-      index: 'hobnob',
+      index: process.env.ELASTICSEARCH_INDEX, //process.env.ELASTICSEARCH_INDEX
       type: this.type,
       id: this.responsePayload,
     }).then(function (res) {
