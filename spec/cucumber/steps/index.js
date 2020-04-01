@@ -135,11 +135,11 @@ When(/^attaches an? (.+) payload which is missing the ([a-zA-Z0-9, ]+) fields?$/
 
   Then(/^the payload object should be added to the database, grouped under the "([a-zA-Z]+)" type$/, function (type, callback) {
     this.type = type;
-    client.get({
-      index: 'hobnob',
-      type: type,
-      id: this.responsePayload,
-    }).then((result) => {
+      client.get({
+        index: 'hobnob',
+        type: type,
+        id: this.responsePayload
+      }).then((result) => {
       assert.deepEqual(result._source, this.requestPayload);
       callback();
     }).catch(callback);
