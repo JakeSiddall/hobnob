@@ -1,25 +1,12 @@
+import ValidationError from '../../validators/errors/validation-error';
+import validate from '../../validators/users/create';
+
 function createUsers(req, res, db) {
-    if (
-      !Object.prototype.hasOwnProperty.call(req.body, 'email') || !Object.prototype.hasOwnProperty.call(req.body, 'password')
-    ) {
-      res.status(400);
-      res.set('Content-Type', 'application/json');
-      res.json({ message: 'Payload must contain at least the email and password fields' });
-    }
-    if (
-      typeof req.body.email !== 'string'
-      || typeof req.body.password !== 'string'
-    ) {
-      res.status(400);
-      res.set('Content-Type', 'application/json');
-      res.json({ message: 'The email and password fields must be of type string' });
-      return;
-    }
-    if (!/^[\w.+]+@\w+\.\w+$/.test(req.body.email)) {
-      res.status(400);
-      res.set('Content-Type', 'application/json');
-      res.json({ message: 'The email field must be a valid email.' });
-      return;
+    const validationResults = validate(req);
+    if (validationResults instanceof ValidationError) {
+        res.status(400);
+        res.set('Content-Type', 'application/json');
+        return res.json({message: validationResults.message});
     }
     db.index({
       index: process.env.ELASTICSEARCH_INDEX,
