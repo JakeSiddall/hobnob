@@ -10,6 +10,9 @@ if ! systemctl is-active --quiet elasticsearch.service; then
     sleep $RETRY_INTERVAL
   done
 fi
+# Clean the test index (if it exists)
+curl --silent -o /dev/null -X DELETE "$ELASTICSEARCH_HOSTNAME:$ELASTICSEARCH_PORT/$ELASTICSEARCH_INDEX"
+
 yarn run serve &
 until ss -lnt | grep -q :$SERVER_PORT; do
   sleep $RETRY_INTERVAL
