@@ -9,7 +9,10 @@ function checkEmptyPayload(req, res, next) {
         message: 'Payload should not be empty',
       });
     }
-    next();
+    else {
+      next();
+    }
+    //next();
   }
 
   export default checkEmptyPayload;
