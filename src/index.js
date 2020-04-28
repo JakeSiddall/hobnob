@@ -6,8 +6,10 @@ import checkEmptyPayload from './middleware/check-empty-payload';
 import checkContentTypeIsSet from './middleware/check-content-type-is-set';
 import checkContentTypeIsJson from './middleware/check-content-type-is-json';
 import errorHandler from './middleware/error-handler';
-import createUser from './handlers/users/create';
 import injectionHandlerDependencies from './utils/inject-handler-dependencies';
+import ValidationError from './validators/errors/validation-error';
+import createUserHandler from './handlers/users/create';
+import createUserEngine from './engines/users/create';
 
 const client = new elasticsearch.Client({
   host: `${process.env.ELASTICSEARCH_PROTOCOL}://${process.env.ELASTICSEARCH_HOSTNAME}:${process.env.ELASTICSEARCH_PORT}`,
@@ -15,12 +17,16 @@ const client = new elasticsearch.Client({
 
 const app = express();
 
+const handlerToEngineMap = new Map([
+  [createUserHandler, createUserEngine],
+]);
+
 app.use(checkEmptyPayload);
 app.use(checkContentTypeIsSet);
 app.use(checkContentTypeIsJson);
 app.use(bodyParser.json({ limit: 1e6 }));
 
-app.post('/users', injectionHandlerDependencies(createUser, client));
+app.post('/users', injectionHandlerDependencies(createUserHandler, client, handlerToEngineMap, ValidationError));
 
 app.use(errorHandler);
 
