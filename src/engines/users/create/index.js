@@ -1,6 +1,3 @@
-//import ValidationError from '../../validators/errors/validation-error';
-//import validate from '../../validators/users/create';
-
 function create(req, db, validator, ValidationError) {
   const validationResults = validator(req);
   if (validationResults instanceof ValidationError) {
