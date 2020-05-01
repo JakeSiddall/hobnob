@@ -12,6 +12,7 @@ const generateCreateStubs = () => ({
 describe('createUser', function() {
     let res;
     let create;
+    let validator;
     const req = {};
     const db = {};
 
@@ -27,7 +28,7 @@ describe('createUser', function() {
     describe("When create resolves with the new user's ID", function() {
         beforeEach(function () {
             create = generateCreateStubs().success;
-            return createUser(req, res, db, create, ValidationError);
+            return createUser(req, res, db, create, validator, ValidationError);
         });
         describe('should call res.status()', function() {
             it('once', function () {
@@ -60,7 +61,7 @@ describe('createUser', function() {
     describe("When create rejects with an instance of ValidationError", function() {
         beforeEach(function () {
             create = generateCreateStubs().validationError;
-            return createUser(req, res, db, create, ValidationError);
+            return createUser(req, res, db, create, validator, ValidationError);
         });
         describe('should call res.status()', function() {
             it('once', function () {
@@ -93,37 +94,37 @@ describe('createUser', function() {
     describe("When create rejects with an instance of Error", function() {
         it('should call res.status once', function() {
             create = generateCreateStubs().genericError;
-            return createUser(req, res, db, create, ValidationError)
+            return createUser(req, res, db, create, validator, ValidationError)
                 .catch(actualError => assert(res.status.calledOnce))
         });
 
         it('should call res.status with the argument 500', function() {
             create = generateCreateStubs().genericError;
-            return createUser(req, res, db, create, ValidationError)
+            return createUser(req, res, db, create, validator, ValidationError)
                 .catch(actualError => assert(res.status.calledWithExactly(500)))
         });
 
         it('should call res.set once', function() {
             create = generateCreateStubs().genericError;
-            return createUser(req, res, db, create, ValidationError)
+            return createUser(req, res, db, create, validator, ValidationError)
                 .catch(actualError => assert(res.set.calledOnce))
         });
 
         it('should call res.set with the arguments "Content-Type" and "application/json"', function() {
             create = generateCreateStubs().genericError;
-            return createUser(req, res, db, create, ValidationError)
+            return createUser(req, res, db, create, validator, ValidationError)
                 .catch(actualError => assert(res.status.calledWithExactly('Content-Type','application/json')))
         });
 
         it('should call res.json() once', function() {
             create = generateCreateStubs().genericError;
-            return createUser(req, res, db, create, ValidationError)
+            return createUser(req, res, db, create, validator, ValidationError)
                 .catch(actualError => assert(res.json.calledOnce))
         });
         
         it('should call res.json() with a validation error object', function() {
             create = generateCreateStubs().genericError;
-            return createUser(req, res, db, create, ValidationError)
+            return createUser(req, res, db, create, validator, ValidationError)
                 .catch(actualError => assert(actualError, 'Internal Server Error'))
         });
     });

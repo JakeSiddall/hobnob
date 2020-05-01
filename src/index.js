@@ -10,6 +10,7 @@ import injectionHandlerDependencies from './utils/inject-handler-dependencies';
 import ValidationError from './validators/errors/validation-error';
 import createUserHandler from './handlers/users/create';
 import createUserEngine from './engines/users/create';
+import createUserValidator from './validators/users/create';
 
 const client = new elasticsearch.Client({
   host: `${process.env.ELASTICSEARCH_PROTOCOL}://${process.env.ELASTICSEARCH_HOSTNAME}:${process.env.ELASTICSEARCH_PORT}`,
@@ -21,12 +22,16 @@ const handlerToEngineMap = new Map([
   [createUserHandler, createUserEngine],
 ]);
 
+const handlerToValidatorMap = new Map([
+  [createUserHandler, createUserValidator],
+]);
+
 app.use(checkEmptyPayload);
 app.use(checkContentTypeIsSet);
 app.use(checkContentTypeIsJson);
 app.use(bodyParser.json({ limit: 1e6 }));
 
-app.post('/users', injectionHandlerDependencies(createUserHandler, client, handlerToEngineMap, ValidationError));
+app.post('/users', injectionHandlerDependencies(createUserHandler, client, handlerToEngineMap, handlerToValidatorMap, ValidationError));
 
 app.use(errorHandler);
 
