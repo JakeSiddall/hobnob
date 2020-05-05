@@ -1,8 +1,10 @@
 import assert from 'assert';
 import superagent from 'superagent';
-import { When, Then } from 'cucumber';
+import { When, Then, setDefaultTimeout } from 'cucumber';
 import {getValidPayload, convertStringToArray } from './utils';
 import elasticsearch from 'elasticsearch';
+
+setDefaultTimeout(20 * 1000);
 
 const client = new elasticsearch.Client({
     host: `${process.env.ELASTICSEARCH_PROTOCOL}://${process.env.ELASTICSEARCH_HOSTNAME}:${process.env.ELASTICSEARCH_PORT}`,
@@ -29,16 +31,16 @@ When(/^attaches a generic (.+) payload$/, function (payloadType) {
   }
 });
 
-When(/^sends the request$/, function (callback) {
+When('sends the request', function (callback) {
   this.request
-    .then((response) => {
+    .then(response => {
       this.response = response.res;
       callback();
     })
-    .catch((error) => {
+    .catch(error => {
       this.response = error.response;
       callback();
-    });
+    })
 });
 
 Then(/^our API should respond with a ([1-5]\d{2}) HTTP status code$/, function (statusCode) {
@@ -154,4 +156,12 @@ When(/^attaches an? (.+) payload which is missing the ([a-zA-Z0-9, ]+) fields?$/
       assert.equal(res.result, 'deleted');
       callback();
     }).catch(callback);
+  });
+
+  When(/^attaches (.+) as the payload$/, function (payload) {
+    this.requestPayload = JSON.parse(payload);
+    this.request
+      .send(payload)
+      .set('Content-Type', 'application/json')
+    return;
   });
